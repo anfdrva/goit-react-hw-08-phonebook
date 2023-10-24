@@ -1,16 +1,48 @@
-import { useSelector } from 'react-redux';
-import { getIsLoggedIn } from 'redux/auth/authSelectors';
-import { Link } from './Navigation.styled';
+import { NavLink } from 'react-router-dom';
+import { Box } from '@chakra-ui/react';
+import { useAuth } from 'hooks/useAuth';
 
-const Navigation = () => {
-  const isLoggedIn = useSelector(getIsLoggedIn);
-
+export const Navigation = () => {
+  const { isLoggedIn } = useAuth();
   return (
-    <nav>
-      <Link to="/">Home</Link>
-      {isLoggedIn && <Link to="/contacts">Contacts</Link>}
-    </nav>
+    <Box display="flex" alignItems="center" padding="15px">
+      <NavLink to="/">
+        <Box
+          margin="10px"
+          backgroundColor="#ffffff"
+          as="button"
+          p={3}
+          color="black"
+          fontWeight="bold"
+          borderRadius="md"
+          _hover={{
+            backgroundColor: '#B345FE',
+            color: '#ffffff',
+          }}
+        >
+          Home
+        </Box>
+      </NavLink>
+
+      {isLoggedIn && (
+        <NavLink to="/contacts">
+          <Box
+            backgroundColor="#ffffff"
+            as="button"
+            p={3}
+            color="black"
+            fontWeight="bold"
+            borderRadius="md"
+            mr="0"
+            _hover={{
+              backgroundColor: '#B345FE',
+              color: '#ffffff',
+            }}
+          >
+            Contacts
+          </Box>
+        </NavLink>
+      )}
+    </Box>
   );
 };
-
-export default Navigation;

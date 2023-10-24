@@ -1,54 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { getContacts, getFilter } from 'redux/contacts/selectors';
-import { useEffect } from 'react';
-import { fetchContacts, requestDeleteContact } from 'redux/contacts/operations';
-import Loader from 'components/Loader/Loader';
-import Error from 'components/Error/Error';
-import { getIsLoggedIn } from 'redux/auth/authSelectors';
+import { List, Item, Button } from './ContactList.styled';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/contacts/operations';
 
-const ContactList = () => {
-  const filter = useSelector(getFilter);
-  const isLoggedIn = useSelector(getIsLoggedIn);
-  const contacts = useSelector(getContacts);
+export const ContactsList = ({ contacts }) => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
-  const deleteContact = id => {
-    dispatch(requestDeleteContact(id));
-  };
-
-  const filteredContacts = contacts.items.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
-
   return (
-    <>
-      {contacts.isLoading && <Loader />}
-      {contacts.error && <Error error={contacts.error} />}
-      <ul>
-        {isLoggedIn &&
-          filteredContacts.map(contact => {
-            const { id, name, number } = contact;
-            return (
-              <li key={id}>
-                {name}: {number}
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => deleteContact(id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-      </ul>
-    </>
+    <List>
+      {contacts.map(({ id, name, number }) => {
+        return (
+          <Item key={id}>
+            {name}: {number}
+            <Button type="button" onClick={() => dispatch(deleteContact(id))}>
+              Delete
+            </Button>
+          </Item>
+        );
+      })}
+    </List>
   );
 };
-
-export default ContactList;

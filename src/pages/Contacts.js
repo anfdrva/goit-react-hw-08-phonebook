@@ -1,17 +1,55 @@
+import { Section } from '../components/Section/Section';
+import { Filter } from '../components/Filter/Filter';
+import { ContactsList } from 'components/ContactList/ContactList';
+import { ContactForm } from '../components/ContactForm/ContactForm';
+import { Wrap } from '../components/App.styled';
 
-import ContactForm from 'components/ContactForm/ContactForm';
-import ContactList from 'components/ContactList/ContactList';
-import Filter from 'components/Filter/Filter';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectContacts,
+  selectisLoading,
+  selectError,
+  selectFilteredContacts,
+} from '../redux/contacts/selectors';
+import { fetchContacts, addContact } from '../redux/contacts/operations';
+import { useEffect } from 'react';
 
+export default function App() {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const isLoading = useSelector(selectisLoading);
+  const error = useSelector(selectError);
+  const filter = useSelector(selectFilteredContacts);
 
-const Contacts = () => {
+  const newContact = name => {
+    return contacts.find(
+      contact => contact.name.toLowerCase() === name.name.toLowerCase()
+    );
+  };
+
+  const handleSubmit = (values, { resetForm }) => {
+    const existingContact = newContact(values);
+    if (existingContact) {
+      alert(`${values.name} is already in contacts`);
+    } else {
+      dispatch(addContact(values));
+      resetForm();
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
-    <>
-      <ContactForm />
+    <Wrap>
+      <ContactForm handleSubmit={handleSubmit} />
       <Filter />
-      <ContactList />
-    </>
+      <Section title={`Contacts list`}>
+        {isLoading && <p>Loading contacts...</p>}
+        {error && <p>{error}</p>}
+        {contacts.length > 0 && <ContactsList contacts={filter} />}
+      </Section>
+    </Wrap>
   );
-};
-
-export default Contacts;
+}
